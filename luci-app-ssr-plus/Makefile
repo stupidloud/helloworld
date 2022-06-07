@@ -1,8 +1,8 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=luci-app-ssr-plus
-PKG_VERSION:=185
-PKG_RELEASE:=5
+PKG_VERSION:=186
+PKG_RELEASE:=1
 
 PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Kcptun \
@@ -10,6 +10,7 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_NaiveProxy \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_PDNSD \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Redsocks2 \
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_SagerNet_Core \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Client \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Server \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Rust_Client \
@@ -34,6 +35,8 @@ LUCI_DEPENDS:= \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_NaiveProxy:naiveproxy \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_PDNSD:pdnsd-alt \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Redsocks2:redsocks2 \
+	+PACKAGE_$(PKG_NAME)_INCLUDE_SagerNet_Core:curl \
+	+PACKAGE_$(PKG_NAME)_INCLUDE_SagerNet_Core:sagernet-core \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Client:shadowsocks-libev-ss-local \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Client:shadowsocks-libev-ss-redir \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Server:shadowsocks-libev-ss-server \
@@ -50,6 +53,8 @@ LUCI_DEPENDS:= \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns:mosdns
 
 define Package/$(PKG_NAME)/config
+select PACKAGE_luci-lib-ipkg if PACKAGE_$(PKG_NAME)
+
 config PACKAGE_$(PKG_NAME)_INCLUDE_Kcptun
 	bool "Include Kcptun"
 	default n
@@ -71,9 +76,13 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_Redsocks2
 	bool "Include Redsocks2"
 	default n
 
+config PACKAGE_$(PKG_NAME)_INCLUDE_SagerNet_Core
+	bool "Include sagernet-core (An enhanced edition of v2ray-core)"
+	default y if aarch64||arm||i386||x86_64
+
 config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Client
 	bool "Include Shadowsocks Libev Client"
-	default y if i386||x86_64||arm
+	default y if arm
 
 config PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_Libev_Server
 	bool "Include Shadowsocks Libev Server"
