@@ -75,7 +75,7 @@ flush_r() {
 	ipset -X gmlan 2>/dev/null
 	ipset -X oversea 2>/dev/null
 	ipset -X whitelist 2>/dev/null
-	ipset -X blacklist 2>/dev/null
+	#ipset -X blacklist 2>/dev/null
 	ipset -X netflix 2>/dev/null
 	[ -n "$FWI" ] && echo '#!/bin/sh' >$FWI
 	return 0
@@ -97,12 +97,14 @@ ipset_r() {
 		$IPT -A SS_SPEC_WAN_AC -m set --match-set china dst -j RETURN
 		$IPT -A SS_SPEC_WAN_AC -m set --match-set gmlan src -m set ! --match-set china dst -j SS_SPEC_WAN_FW
 		$IPT -A SS_SPEC_WAN_AC -j SS_SPEC_WAN_FW
+		[ -n "$(command -v ip6tables)" ] && . /etc/ssrplus/blockipv6.sh
 		;;
 	gfw)
 		ipset -N gfwlist hash:net 2>/dev/null
 		$IPT -A SS_SPEC_WAN_AC -m set --match-set china dst -j RETURN
 		$IPT -A SS_SPEC_WAN_AC -m set --match-set gfwlist dst -j SS_SPEC_WAN_FW
 		$IPT -A SS_SPEC_WAN_AC -m set --match-set gmlan src -m set ! --match-set china dst -j SS_SPEC_WAN_FW
+		[ -n "$(command -v ip6tables)" ] && . /etc/ssrplus/blockipv6.sh
 		;;
 	oversea)
 		ipset -N oversea hash:net 2>/dev/null
@@ -122,6 +124,11 @@ ipset_r() {
 	$IPT -I SS_SPEC_WAN_AC -m set --match-set bplan src -j RETURN
 	ipset -N whitelist hash:net 2>/dev/null
 	ipset -N blacklist hash:net 2>/dev/null
+	if [ $? -eq 0 ]; then
+	while read ip; do
+		ipset -! add blacklist $ip
+	done < /etc/ssrplus/blackipv4.sh
+	fi
 	$IPT -I SS_SPEC_WAN_AC -m set --match-set blacklist dst -j SS_SPEC_WAN_FW
 	$IPT -I SS_SPEC_WAN_AC -m set --match-set whitelist dst -j RETURN
 	if [ $(ipset list music -name -quiet | grep music) ]; then
@@ -190,7 +197,7 @@ ac_rule() {
 		$IPT -I PREROUTING 1 -p tcp $EXT_ARGS $MATCH_SET -m comment --comment "$TAG" -j SS_SPEC_WAN_AC
 	else
 		for name in $Interface; do
-			local IFNAME=$(uci -P /var/state get network.$name.ifname 2>/dev/null)
+			local IFNAME=$(uci -P /var/state get network.$name.device 2>/dev/null)
 			[ -z "$IFNAME" ] && IFNAME=$(uci -P /var/state get network.$name.device 2>/dev/null)
 			[ -n "$IFNAME" ] && $IPT -I PREROUTING 1 ${IFNAME:+-i $IFNAME} -p tcp $EXT_ARGS $MATCH_SET -m comment --comment "$TAG" -j SS_SPEC_WAN_AC
 		done
@@ -237,15 +244,12 @@ tp_rule() {
 	router)
 		$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set ss_spec_wan_ac dst -j RETURN
 		$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set china dst -j RETURN
-		$ipt -A SS_SPEC_TPROXY -p udp --dport 443 -j DROP
-		$ipt -A SS_SPEC_TPROXY -p udp --dport 80 -j DROP
 		$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set gmlan src -m set ! --match-set china dst -j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
 		$ipt -A SS_SPEC_TPROXY -p udp $PROXY_PORTS -m set ! --match-set ss_spec_wan_ac dst -j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
 		;;
 	gfw)
 		$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set china dst -j RETURN
-		$ipt -A SS_SPEC_TPROXY -p udp --dport 443 -j DROP
-		$ipt -A SS_SPEC_TPROXY -p udp --dport 80 -j DROP
+		$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set blacklist dst -j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
 		$ipt -A SS_SPEC_TPROXY -p udp $PROXY_PORTS -m set --match-set gfwlist dst -j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
 		$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set gmlan src -m set ! --match-set china dst -j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
 		;;
@@ -253,6 +257,10 @@ tp_rule() {
 		$ipt -A SS_SPEC_TPROXY -p udp $PROXY_PORTS -m set --match-set oversea src -m dst -j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
 		$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set gmlan src -m set -j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
 		$ipt -A SS_SPEC_TPROXY -p udp $PROXY_PORTS -m set --match-set china dst -j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
+		;;
+	dyn)
+		$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set blacklist dst -j DROP
+		#$ipt -A SS_SPEC_TPROXY -p udp -m set --match-set blacklist dst -j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
 		;;
 	all)
 		$ipt -A SS_SPEC_TPROXY -p udp $PROXY_PORTS -j TPROXY --on-port "$LOCAL_PORT" --tproxy-mark 0x01/0x01
@@ -262,7 +270,7 @@ tp_rule() {
 		$ipt -I PREROUTING 1 -p udp $EXT_ARGS $MATCH_SET -m comment --comment "$TAG" -j SS_SPEC_TPROXY
 	else
 		for name in $Interface; do
-			local IFNAME=$(uci -P /var/state get network.$name.ifname 2>/dev/null)
+			local IFNAME=$(uci -P /var/state get network.$name.device 2>/dev/null)
 			[ -z "$IFNAME" ] && IFNAME=$(uci -P /var/state get network.$name.device 2>/dev/null)
 			[ -n "$IFNAME" ] && $ipt -I PREROUTING 1 ${IFNAME:+-i $IFNAME} -p udp $EXT_ARGS $MATCH_SET -m comment --comment "$TAG" -j SS_SPEC_TPROXY
 		done
@@ -317,7 +325,7 @@ gen_include() {
 	return 0
 }
 
-while getopts ":m:s:l:S:L:i:e:a:B:b:w:p:G:D:F:N:M:I:oOuUfgrczh" arg; do
+while getopts ":m:s:l:S:L:i:e:a:B:b:w:p:G:D:F:N:M:I:oOuUfgrczdh" arg; do
 	case "$arg" in
 	m)
 		Interface=$OPTARG
@@ -396,6 +404,9 @@ while getopts ":m:s:l:S:L:i:e:a:B:b:w:p:G:D:F:N:M:I:oOuUfgrczh" arg; do
 		;;
 	z)
 		RUNMODE=all
+		;;
+	d)
+		RUNMODE=dyn
 		;;
 	f)
 		flush_r
