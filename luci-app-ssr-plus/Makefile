@@ -156,10 +156,6 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_Trojan
 	select PACKAGE_$(PKG_NAME)_INCLUDE_IPT2Socks
 	default n
 
-config PACKAGE_$(PKG_NAME)_INCLUDE_V2ray_Plugin
-	bool "Include Shadowsocks V2ray Plugin"
-	default n
-
 config PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns
 	bool "Include mosdns"
 	default y
