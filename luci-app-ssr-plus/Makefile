@@ -24,14 +24,8 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_V2ray_Plugin \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server \
-<<<<<<< HEAD
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Simple_Obfs \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Trojan \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_V2ray_Plugin \
-	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns
-=======
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Trojan
->>>>>>> lean
 
 LUCI_TITLE:=SS/SSR/V2Ray/Trojan/NaiveProxy/Socks5/Tun LuCI interface
 LUCI_PKGARCH:=all
@@ -61,14 +55,8 @@ LUCI_DEPENDS:= \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client:shadowsocksr-libev-ssr-local \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client:shadowsocksr-libev-ssr-redir \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server:shadowsocksr-libev-ssr-server \
-<<<<<<< HEAD
-	+PACKAGE_$(PKG_NAME)_INCLUDE_Simple_Obfs:simple-obfs \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_Trojan:trojan \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_V2ray_Plugin:v2ray-plugin \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns:mosdns
-=======
+	+PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns:mosdns \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Trojan:trojan
->>>>>>> lean
 
 define Package/$(PKG_NAME)/config
 select PACKAGE_luci-lib-ipkg if PACKAGE_$(PKG_NAME)
