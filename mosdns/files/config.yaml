@@ -107,6 +107,7 @@ plugins:
             - if: "!response_has_local_ip"
               exec:
                 - _prefer_ipv4
+                - blacklist
           fast_fallback: 150
           always_standby: true
 
