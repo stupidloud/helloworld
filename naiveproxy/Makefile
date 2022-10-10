@@ -5,12 +5,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=naiveproxy
-PKG_VERSION:=103.0.5060.53-3
-PKG_RELEASE:=1
+PKG_VERSION:=106.0.5249.91-1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/klzgrad/naiveproxy/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=29ffeb8ee5354739f5445f82665d03fbc78aa34c967d4a5a1d106ae7fa23a918
+PKG_HASH:=691dea8921b7ef48f5073b1a262584ae6b27c844fc28ce0474c98cd4e8ecce04
 
 PKG_LICENSE:=BSD 3-Clause
 PKG_LICENSE_FILES:=LICENSE
@@ -75,31 +75,31 @@ ifneq ($(CONFIG_CCACHE),)
   export naive_ccache_flags=cc_wrapper="$(CCACHE)"
 endif
 
-CLANG_VER:=15-init-10168-gc2a7904a-1
+CLANG_VER:=16-init-907-g8b740747-1
 CLANG_FILE:=clang-llvmorg-$(CLANG_VER).tgz
 define Download/CLANG
 	URL:=https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64
 	URL_FILE:=$(CLANG_FILE)
 	FILE:=$(CLANG_FILE)
-	HASH:=9b19d831249a6328f4d8e52de269cb925b9a868e628ee2e30fc4462a77be52f7
+	HASH:=fc874a199fcb217e246c70a8280f959ad1bfed5de27ab25877421e8588237194
 endef
 
-GN_VER:=578a7fe4c3c6b0bc2ae1fd2e37f14857d09895bf
+GN_VER:=0bcd37bd2b83f1a9ee17088037ebdfe6eab6d31a
 GN_FILE:=gn-git_revision-$(GN_VER).zip
 define Download/GN_TOOL
 	URL:=https://chrome-infra-packages.appspot.com/dl/gn/gn/linux-amd64/+
 	URL_FILE:=git_revision:$(GN_VER)
 	FILE:=$(GN_FILE)
-	HASH:=9b43714dc93695deef6a7c84aec284601da9277422cf94faff46ffa278100cde
+	HASH:=b8bd7e136e3fefe8be27b60f8492a0c7648337a7796b538d310c0dbd0b36a82f
 endef
 
-PGO_VER:=5060-1655228597-bbe06f169cac6956903f78358c30d94a01938b2e
+PGO_VER:=5249-1664382991-4c3563c0a634429d8d381274051e58611ae6cfe3
 PGO_FILE:=chrome-linux-$(PGO_VER).profdata
 define Download/PGO_PROF
 	URL:=https://storage.googleapis.com/chromium-optimization-profiles/pgo_profiles
 	URL_FILE:=$(PGO_FILE)
 	FILE:=$(PGO_FILE)
-	HASH:=67d472fc1be1a08288d985138e8af92fc33fd60d8e253a5b04158a2b9d2d01ea
+	HASH:=91cca2a7922040625c4fdb18db6035a2ffbf59b737bd1706966f1e4da06b468d
 endef
 
 define Build/Prepare
@@ -122,7 +122,7 @@ define Build/Configure
 		. ../init_env.sh "$(ARCH)" $(CPU_TYPE) $(CPU_SUBTYPE) "$(TOOLCHAIN_DIR)" ; \
 		export naive_flags+=" $$$${naive_ccache_flags}" ; \
 		mkdir -p "out" ; \
-		./gn/out/gn gen "out/Release" --args="$$$${naive_flags}" --script-executable="$(PYTHON)" ; \
+		./gn/out/gn gen "out/Release" --args="$$$${naive_flags}" --script-executable="python3" ; \
 		popd ; \
 	)
 endef
@@ -135,13 +135,13 @@ define Build/Compile
 endef
 
 define Build/InstallDev
-	$(INSTALL_DIR) $(1)/usr/include
+	$(INSTALL_DIR) $(1)/usr/include/libcronet
 	$(CP) \
 		$(PKG_BUILD_DIR)/src/components/grpc_support/include/bidirectional_stream_c.h \
 		$(PKG_BUILD_DIR)/src/components/cronet/native/generated/cronet.idl_c.h \
 		$(PKG_BUILD_DIR)/src/components/cronet/native/include/cronet_c.h \
 		$(PKG_BUILD_DIR)/src/components/cronet/native/include/cronet_export.h \
-		$(1)/usr/include/
+		$(1)/usr/include/libcronet/
 endef
 
 define Package/naiveproxy/install
