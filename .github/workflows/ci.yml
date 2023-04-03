@@ -37,13 +37,11 @@ jobs:
         curl https://api.github.com/meta | jq -r '.web[]' | grep -E '(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))' | blockipv6
         curl https://www.cloudflare.com/ips-v4 -w "\n" > luci-app-ssr-plus/root/etc/ssrplus/blackipv4.sh
         curl https://api.fastly.com/public-ip-list | jq -r '.addresses[]' | blackipv4
-        curl https://api.bgpview.io/asn/44907/prefixes | jq '.data.ipv4_prefixes' | jq -r '.[].prefix' | blackipv4
-        sleep 1
-        curl https://api.bgpview.io/asn/59930/prefixes | jq '.data.ipv4_prefixes' | jq -r '.[].prefix' | blackipv4
-        sleep 1
-        curl https://api.bgpview.io/asn/62014/prefixes | jq '.data.ipv4_prefixes' | jq -r '.[].prefix' | blackipv4
-        sleep 1
-        curl https://api.bgpview.io/asn/62041/prefixes | jq '.data.ipv4_prefixes' | jq -r '.[].prefix' | blackipv4
+        echo '!gas44907'|nc whois.radb.net 43 | tail +2 | head -n -1 | xargs -n1 echo | blackipv4
+        echo '!gas59930'|nc whois.radb.net 43 | tail +2 | head -n -1 | xargs -n1 echo | blackipv4
+        echo '!gas62014'|nc whois.radb.net 43 | tail +2 | head -n -1 | xargs -n1 echo | blackipv4
+        echo '!gas62041'|nc whois.radb.net 43 | tail +2 | head -n -1 | xargs -n1 echo | blackipv4
+        echo '!gas211157'|nc whois.radb.net 43 | tail +2 | head -n -1 | xargs -n1 echo | blackipv4
         curl https://ip-ranges.amazonaws.com/ip-ranges.json | jq -r '.prefixes[] | select(.service=="S3" or .service=="CLOUDFRONT") | .ip_prefix' | blackipv4
         curl https://raw.githubusercontent.com/Gelob/azure-cdn-ips/master/edgenodes-ipv4.txt | blackipv4
         curl https://api.github.com/meta | jq -r '.web[]' | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | blackipv4
