@@ -44,6 +44,8 @@ jobs:
         curl https://api.bgpview.io/asn/62014/prefixes | jq '.data.ipv4_prefixes' | jq -r '.[].prefix' | blackipv4
         sleep 1
         curl https://api.bgpview.io/asn/62041/prefixes | jq '.data.ipv4_prefixes' | jq -r '.[].prefix' | blackipv4
+        sleep 1
+        curl https://api.bgpview.io/asn/211157/prefixes | jq '.data.ipv4_prefixes' | jq -r '.[].prefix' | blackipv4
         curl https://ip-ranges.amazonaws.com/ip-ranges.json | jq -r '.prefixes[] | select(.service=="S3" or .service=="CLOUDFRONT") | .ip_prefix' | blackipv4
         curl https://raw.githubusercontent.com/Gelob/azure-cdn-ips/master/edgenodes-ipv4.txt | blackipv4
         curl https://api.github.com/meta | jq -r '.web[]' | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | blackipv4
