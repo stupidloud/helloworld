@@ -85,11 +85,11 @@ plugins:
         - 'provider:geoip:cn'
 
   # 匹配广告域名的插件
-  - tag: query_is_ad_domain
-    type: query_matcher
-    args:
-      domain:
-        - 'provider:geosite:category-ads-all'
+  #- tag: query_is_ad_domain
+  #  type: query_matcher
+  #  args:
+  #    domain:
+  #      - 'provider:geosite:category-ads-all'
 
   # 主要的运行逻辑插件
   # sequence 插件中调用的插件 tag 必须在 sequence 前定义，
