@@ -56,10 +56,10 @@ plugins:
         - addr:   tcp://208.67.222.222
           trusted: true # 是否是可信服务器
   - tag: is_gate
-    type: query_matcher
+    type: response_matcher
     args:
-      domain:
-        - "gate.example.net"
+      ip:
+        - "255.255.255.255"
 
   # 匹配本地域名的插件
   - tag: query_is_local_domain
@@ -109,10 +109,6 @@ plugins:
 
         - primary:
             - forward_local
-            - if: "is_gate"
-              exec:
-                - whitelist
-                - _return
             - if: "response_has_local_ip"
               exec:
                 - _return
@@ -123,7 +119,7 @@ plugins:
             - _no_ecs
             - _prefer_ipv4
             - forward_remote
-            - if: "!response_has_local_ip"
+            - if: "!response_has_local_ip && !is_gate"
               exec:
                 - blacklist
           fast_fallback: 150
