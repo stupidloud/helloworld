@@ -192,6 +192,7 @@ if args then
 		else
 			log(-1)
 		end
+	end
 	if args == "mosdns" then
 		ret = luci.sys.exec("/bin/bash /usr/share/shadowsocksr/updatemosdns.sh")
 		log(ret, 0)
