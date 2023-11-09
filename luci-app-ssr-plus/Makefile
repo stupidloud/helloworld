@@ -27,6 +27,7 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Shadowsocks_V2ray_Plugin \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server \
+	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns \
 	CONFIG_PACKAGE_$(PKG_NAME)_INCLUDE_Trojan
 
 LUCI_TITLE:=SS/SSR/V2Ray/Trojan/NaiveProxy/Tuic/ShadowTLS/Hysteria/Socks5/Tun LuCI interface
@@ -62,6 +63,7 @@ LUCI_DEPENDS:= \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client:shadowsocksr-libev-ssr-local \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client:shadowsocksr-libev-ssr-redir \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server:shadowsocksr-libev-ssr-server \
+	+PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns:mosdns \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Trojan:trojan
 
 define Package/$(PKG_NAME)/config
@@ -183,11 +185,16 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_Trojan
 	bool "Include Trojan"
 	select PACKAGE_$(PKG_NAME)_INCLUDE_IPT2Socks
 	default n
+
+config PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns
+	bool "Include mosdns"
+	default y
 endef
 
 define Package/$(PKG_NAME)/conffiles
 /etc/config/shadowsocksr
 /etc/ssrplus/
+/etc/mosdns/config.yaml
 endef
 
 include $(TOPDIR)/feeds/luci/luci.mk

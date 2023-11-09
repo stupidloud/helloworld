@@ -52,6 +52,7 @@ EXTRA_COMMANDS='reset'
 EXTRA_HELP="        reset   Reset to default settings"
 #extra_command "reset" "Reset to default settings"
 PS="/bin/busybox ps"
+mosdns_bypass_ip=''
 
 uci_get_by_name() {
 	local ret=$(uci get $NAME.$1.$2 2>/dev/null)
@@ -1051,7 +1052,9 @@ start_monitor() {
 }
 
 start_rules() {
+	rm -f /tmp/config.yaml.tp2
 	local server=$(get_host_ip $GLOBAL_SERVER)
+	mosdns_bypass_ip=$server
 	local local_port=$(uci_get_by_name $GLOBAL_SERVER local_port)
 	local lan_ac_ips=$(uci_get_by_type access_control lan_ac_ips)
 	local lan_ac_mode=$(uci_get_by_type access_control lan_ac_mode)
@@ -1069,6 +1072,7 @@ start_rules() {
 	fi
 	gfwmode() {
 		case "$(uci_get_by_type global run_mode)" in
+		dyn) echo "-d" ;;
 		gfw) echo "-g" ;;
 		router) echo "-r" ;;
 		oversea) echo "-c" ;;
@@ -1107,6 +1111,36 @@ start_rules() {
 	return $?
 }
 
+start_mosdns(){
+	killall -q -9 mosdns
+	sed "s/255.255.255.255/$mosdns_bypass_ip/" /etc/mosdns/config.yaml.tpl > /etc/mosdns/config.yaml
+	/usr/bin/mosdns start -d /etc/mosdns/ -c config.yaml >/dev/null 2>&1 &
+	sed -i "/list server/d" /etc/config/dhcp
+	uci add_list dhcp.@dnsmasq[0].server='127.0.0.1#5335'
+	uci set dhcp.@dnsmasq[0].noresolv="1"
+	uci commit dhcp
+	/etc/init.d/dnsmasq reload
+	ipset add blacklist 1.1.1.1
+	ipset add blacklist 76.76.19.19
+	ipset add blacklist 208.67.222.222
+
+	config_get_bool adg_enabled AdGuardHome enabled 0
+	[ "$enabled" == "1" ] && /etc/init.d/AdGuardHome stop
+}
+stop_mosdns(){
+	killall -q -9 mosdns
+	sed -i "/list server/d" /etc/config/dhcp
+	uci set dhcp.@dnsmasq[0].noresolv="0"
+	uci commit dhcp
+	/etc/init.d/dnsmasq reload
+	ipset del blacklist 1.1.1.1
+	ipset del blacklist 76.76.19.19
+	ipset del blacklist 208.67.222.222
+
+	config_get_bool adg_enabled AdGuardHome enabled 0
+	[ "$enabled" == "1" ] && /etc/init.d/AdGuardHome start
+}
+
 start() {
 	set_lock
 	echolog "----------start------------"
@@ -1115,9 +1149,10 @@ start() {
 	if load_config; then
 		Start_Run
 		start_rules
-		start_dns
+		[ "$(uci_get_by_type global run_mode)" != "dyn" ] && start_dns
 		add_cron
 		start_switch
+		[ "$(uci_get_by_type global run_mode)" == "dyn" ] && start_mosdns
 	else
 		echolog "未启动主节点，禁止连接的域名正在加载。"
 		cat /etc/ssrplus/deny.list | sed '/^$/d' | sed '/#/d' | sed "/.*/s/.*/address=\/&\//" >$TMP_DNSMASQ_PATH/denylist.conf
@@ -1151,6 +1186,7 @@ boot() {
 stop() {
 	unlock
 	set_lock
+	stop_mosdns
 	/usr/bin/ssr-rules -f
 	local srulecount=$(iptables -L | grep SSR-SERVER-RULE | wc -l)
 	if [ $srulecount -gt 0 ]; then
@@ -1201,9 +1237,9 @@ reset() {
 		set shadowsocksr.@global[0].netflix_server='nil'
 		set shadowsocksr.@global[0].netflix_proxy='0'
 		set shadowsocksr.@global[0].threads='0'
-		set shadowsocksr.@global[0].run_mode='router'
-		set shadowsocksr.@global[0].dports='2'
-		set shadowsocksr.@global[0].pdnsd_enable='1'
+		set shadowsocksr.@global[0].run_mode='dyn'
+		set shadowsocksr.@global[0].dports='1'
+		set shadowsocksr.@global[0].pdnsd_enable='0'
 		set shadowsocksr.@global[0].tunnel_forward='8.8.4.4:53'
 		set shadowsocksr.@global[0].monitor_enable='1'
 		set shadowsocksr.@global[0].enable_switch='1'
