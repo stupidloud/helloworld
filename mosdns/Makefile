@@ -27,7 +27,8 @@ PKG_LICENSE_FILE:=LICENSE
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
 PKG_CONFIG_DEPENDS:= \
-	CONFIG_MOSDNS_COMPRESS_UPX
+	CONFIG_MOSDNS_COMPRESS_UPX \
+	CONFIG_PACKAGE_v2ray-geodata
 
 include $(INCLUDE_DIR)/package.mk
 
