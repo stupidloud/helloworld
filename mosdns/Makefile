@@ -27,8 +27,7 @@ PKG_LICENSE_FILE:=LICENSE
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
 PKG_CONFIG_DEPENDS:= \
-	CONFIG_MOSDNS_COMPRESS_UPX \
-	CONFIG_PACKAGE_v2ray-geodata
+	CONFIG_MOSDNS_COMPRESS_UPX
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -40,7 +39,7 @@ define Package/mosdns
   SUBMENU:=IP Addresses and Names
   TITLE:=A plug-in DNS forwarder/splitter
   URL:=https://github.com/IrineSistiana/mosdns
-  DEPENDS:=@(x86_64||arm||aarch64)
+  DEPENDS:=@(x86_64||arm||aarch64) +v2ray-geoip +v2ray-geosite
 endef
 
 define Package/mosdns/config
