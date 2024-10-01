@@ -17,6 +17,7 @@ ipset -! add blockipv6 2a05:d070:e000::/40
 ipset -! add blockipv6 2a05:d034:5000::/40
 ipset -! add blockipv6 240f:80f8:4000::/40
 ipset -! add blockipv6 2600:9000:a310::/48
+ipset -! add blockipv6 2600:1ff0:7400::/40
 ipset -! add blockipv6 2a05:d070:b000::/40
 ipset -! add blockipv6 2a05:d07a:c000::/40
 ipset -! add blockipv6 2a05:d034:1000::/40
@@ -42,6 +43,7 @@ ipset -! add blockipv6 2406:daf8:c000::/40
 ipset -! add blockipv6 2406:daf9:6000::/40
 ipset -! add blockipv6 2a05:d07a:e000::/40
 ipset -! add blockipv6 2406:daf0:f000::/40
+ipset -! add blockipv6 2600:1f68:7400::/40
 ipset -! add blockipv6 2a05:d070:a000::/40
 ipset -! add blockipv6 2a05:d07a:2000::/40
 ipset -! add blockipv6 2a05:d07a:6000::/40
@@ -51,6 +53,7 @@ ipset -! add blockipv6 2a05:d050:6000::/40
 ipset -! add blockipv6 2600:1ff9:6000::/40
 ipset -! add blockipv6 2406:daf8:a000::/40
 ipset -! add blockipv6 2600:1fa0:4000::/39
+ipset -! add blockipv6 2406:daa0:4800::/40
 ipset -! add blockipv6 2404:c2c0:200::/40
 ipset -! add blockipv6 2a05:d078:c000::/40
 ipset -! add blockipv6 2600:1ff9:1000::/40
@@ -69,11 +72,13 @@ ipset -! add blockipv6 2406:daf8:f000::/40
 ipset -! add blockipv6 2600:1ff9:c000::/40
 ipset -! add blockipv6 2406:daa0:8000::/40
 ipset -! add blockipv6 2001:3fc7:9800::/40
+ipset -! add blockipv6 2406:daf0:4800::/40
 ipset -! add blockipv6 240f:80fa:8000::/40
 ipset -! add blockipv6 2001:3fc3:4800::/40
 ipset -! add blockipv6 2406:daf8:b000::/40
 ipset -! add blockipv6 2400:7fc0:2800::/40
 ipset -! add blockipv6 2600:1ff0:2000::/40
+ipset -! add blockipv6 2406:daf0:c800::/40
 ipset -! add blockipv6 240f:80a0:4000::/40
 ipset -! add blockipv6 2406:dafa:2000::/40
 ipset -! add blockipv6 2600:9000:a104::/48
@@ -104,6 +109,7 @@ ipset -! add blockipv6 2600:1fa0:6000::/40
 ipset -! add blockipv6 2404:c2c0:2800::/40
 ipset -! add blockipv6 2406:daf0:1000::/40
 ipset -! add blockipv6 2406:dafa:6000::/40
+ipset -! add blockipv6 2406:da68:4800::/40
 ipset -! add blockipv6 2406:daa0:8800::/40
 ipset -! add blockipv6 2600:1ff8:2000::/40
 ipset -! add blockipv6 2a05:d079:2000::/40
@@ -153,7 +159,9 @@ ipset -! add blockipv6 2406:da68:4000::/40
 ipset -! add blockipv6 2406:da68:8000::/40
 ipset -! add blockipv6 2600:1ffa:1000::/40
 ipset -! add blockipv6 2a05:d070:6000::/40
+ipset -! add blockipv6 2406:daa0:c800::/40
 ipset -! add blockipv6 2600:1ff9:8000::/40
+ipset -! add blockipv6 2406:da68:c800::/40
 ipset -! add blockipv6 2600:1ff0:1000::/40
 ipset -! add blockipv6 2a05:d078:a000::/40
 ipset -! add blockipv6 2a05:d050:4000::/40
@@ -180,6 +188,7 @@ ipset -! add blockipv6 2406:dafa:4000::/40
 ipset -! add blockipv6 2404:c2c0:2400::/40
 ipset -! add blockipv6 2600:1ffa:e000::/40
 ipset -! add blockipv6 2406:daf0:e000::/40
+ipset -! add blockipv6 2600:1fa0:7400::/40
 ipset -! add blockipv6 2600:1ffa:8000::/40
 ipset -! add blockipv6 2600:1fa0:a400::/40
 ipset -! add blockipv6 2406:daf9:1000::/40
