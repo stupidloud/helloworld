@@ -88,7 +88,6 @@ ipset -! add blockipv6 2a05:d079:9000::/40
 ipset -! add blockipv6 2406:daf0:b000::/40
 ipset -! add blockipv6 2406:daa0:800::/40
 ipset -! add blockipv6 2406:daf9:f000::/40
-ipset -! add blockipv6 2600:1f60:6000::/40
 ipset -! add blockipv6 2600:1ff0:8000::/39
 ipset -! add blockipv6 2a05:d079:a000::/40
 ipset -! add blockipv6 2001:3fc5:800::/40
