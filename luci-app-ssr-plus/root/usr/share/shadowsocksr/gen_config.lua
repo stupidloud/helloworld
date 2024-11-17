@@ -231,6 +231,17 @@ end
 						}
 					}
 				} or nil,
+				rawSettings = (server.transport == "raw" and server.raw_guise == "http") and {
+					-- raw
+					header = {
+						type = server.raw_guise,
+						request = {
+							-- request
+							path = {server.http_path} or {"/"},
+							headers = {Host = {server.http_host} or {}}
+						}
+					}
+				} or nil,
 				kcpSettings = (server.transport == "kcp") and {
 					-- kcp
 					mtu = tonumber(server.mtu),
@@ -324,7 +335,8 @@ if xray_fragment.fragment ~= "0" or (xray_fragment.noise ~= "0" and xray_noise.e
 		},
 		streamSettings = {
 			sockopt = {
-			tcpNoDelay = true
+			tcpMptcp = (server.mptcp == "1") and true or false, -- MPTCP
+			tcpNoDelay = (server.mptcp == "1") and true or false -- MPTCP
 			}
 		}
 	})
