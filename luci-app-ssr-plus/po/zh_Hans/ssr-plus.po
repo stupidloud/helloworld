@@ -1165,6 +1165,9 @@ msgstr "发送窗口（无需确认即可发送的最大字节数：默认8Mb*2�
 msgid "TUIC receive window"
 msgstr "接收窗口（无需确认即可接收的最大字节数：默认8Mb）"
 
+msgid "Set if the listening socket should be dual-stack"
+msgstr "设置监听套接字为双栈"
+
 msgid "Dual-stack Listening Socket"
 msgstr "双栈 Socket 监听"
 
@@ -1218,3 +1221,9 @@ msgstr "是否要恢复客户端默认配置？"
 
 msgid "Are you sure you want to restore the client to default settings?"
 msgstr "是否真的要恢复客户端默认配置？"
+
+msgid "MosDNS GeoIP List Data"
+msgstr "【MosDNS GeoIP】数据库"
+
+msgid "Dynamic Mode"
+msgstr "MosDNS动态模式"
