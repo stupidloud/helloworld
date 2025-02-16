@@ -184,11 +184,11 @@ if proto and proto:find("tcp") and socks_port ~= "0" then
         -- socks
         protocol = "socks",
         port = tonumber(socks_port),
-        settings = (socks_server.server ~= "same") and {
-			auth = socks_server.socks5_auth,
+        settings = {
+			auth = socks_server.socks5_auth or "noauth",
 			udp = true,
-			mixed = (socks_server.socks5_mixed == '1') and true or false,
-			accounts = (socks_server.socks5_auth ~= "noauth") and {
+			mixed = ((socks_server.socks5_mixed == '1') and true or false) or (socks_server.server == 'same') and nil,
+			accounts = (socks_server.server ~= "same" and (socks_server.socks5_auth and socks_server.socks5_auth ~= "noauth")) and {
 				{
 					user = socks_server.socks5_user,
 					pass = socks_server.socks5_pass
@@ -310,7 +310,7 @@ end
 				} or nil,
 				sockopt = {
 					mark = 250,
-					tcpFastOpen = (server.tcpfastOpen == "1") and true or false, -- XHTTP Tcp Fast Open
+					tcpFastOpen = ((server.transport == "xhttp" and server.tcpfastopen == "1") and true or false) or (server.transport ~= "xhttp") and nil, -- XHTTP Tcp Fast Open
 					tcpMptcp = (server.mptcp == "1") and true or nil, -- MPTCP
 					Penetrate = (server.mptcp == "1") and true or nil, -- Penetrate MPTCP
 					tcpcongestion = server.custom_tcpcongestion, -- 连接服务器节点的 TCP 拥塞控制算法
@@ -350,7 +350,7 @@ if xray_fragment.fragment ~= "0" or (xray_fragment.noise ~= "0" and xray_noise.e
 		streamSettings = {
 			sockopt = {
 			mark = 250,
-			tcpFastOpen = (server.tcpfastOpen == "1") and true or false, -- XHTTP Tcp Fast Open
+			tcpFastOpen = ((server.transport == "xhttp" and server.tcpfastopen == "1") and true or false) or (server.transport ~= "xhttp") and nil, -- XHTTP Tcp Fast Open
 			tcpMptcp = (server.mptcp == "1") and true or nil, -- MPTCP
 			Penetrate = (server.mptcp == "1") and true or nil, -- Penetrate MPTCP
 			tcpcongestion = server.custom_tcpcongestion -- 连接服务器节点的 TCP 拥塞控制算法
