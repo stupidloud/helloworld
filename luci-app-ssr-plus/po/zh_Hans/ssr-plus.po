@@ -1239,6 +1239,9 @@ msgstr "发送窗口（无需确认即可发送的最大字节数：默认8Mb*2�
 msgid "TUIC receive window"
 msgstr "接收窗口（无需确认即可接收的最大字节数：默认8Mb）"
 
+msgid "Set if the listening socket should be dual-stack"
+msgstr "设置监听套接字为双栈"
+
 msgid "Dual-stack Listening Socket"
 msgstr "双栈 Socket 监听"
 
@@ -1298,3 +1301,9 @@ msgstr "订阅节点允许不验证TLS证书"
 
 msgid "Subscribe nodes allows insecure connection as TLS client (insecure)"
 msgstr "订阅节点强制开启 不验证TLS客户端证书 (insecure)"
+
+msgid "MosDNS GeoIP List Data"
+msgstr "【MosDNS GeoIP】数据库"
+
+msgid "Dynamic Mode"
+msgstr "MosDNS动态模式"
