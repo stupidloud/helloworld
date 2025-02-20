@@ -24,7 +24,6 @@ local uciType = 'servers'
 local ucic = luci.model.uci.cursor()
 local proxy = ucic:get_first(name, 'server_subscribe', 'proxy', '0')
 local switch = ucic:get_first(name, 'server_subscribe', 'switch', '1')
-local allow_insecure = ucic:get_first(name, 'server_subscribe', 'allow_insecure', '0')
 local subscribe_url = ucic:get_first(name, 'server_subscribe', 'subscribe_url', {})
 local filter_words = ucic:get_first(name, 'server_subscribe', 'filter_words', '过期时间/剩余流量')
 local save_words = ucic:get_first(name, 'server_subscribe', 'save_words', '')
@@ -258,7 +257,7 @@ local function processData(szType, content)
 			elseif info.host then
 				result.tls_host = info.host
 			end
-			result.insecure = allow_insecure
+			result.insecure = 1
 		else
 			result.tls = "0"
 		end
