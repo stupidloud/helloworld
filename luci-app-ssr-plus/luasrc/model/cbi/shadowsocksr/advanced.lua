@@ -1,9 +1,9 @@
 local m, s, o
-local uci = luci.model.uci.cursor()
+local uci = require "luci.model.uci".cursor()
 local server_table = {}
 local type_table = {}
 local function is_finded(e)
-	return luci.sys.exec('type -t -p "%s"' % e) ~= "" and true or false
+	return luci.sys.exec(string.format('type -t -p "%s" 2>/dev/null', e)) ~= ""
 end
 
 uci:foreach("shadowsocksr", "servers", function(s)
@@ -66,6 +66,7 @@ o:value("https://fastly.jsdelivr.net/gh/gaoyifan/china-operator-ip@ip-lists/chin
 o.default = "https://ispip.clang.cn/all_cn.txt"
 
 o = s:option(Flag, "netflix_enable", translate("Enable Netflix Mode"))
+o.description = translate("When disabled shunt mode, will same time stopped shunt service.")
 o.rmempty = false
 
 o = s:option(Value, "nfip_url", translate("nfip_url"))
@@ -202,6 +203,7 @@ for key, server_type in pairs(type_table) do
         o:depends("server", key)
     end
 end
+o:depends({server = "same", disable = true}) 
 
 -- Socks User
 o = s:option(Value, "socks5_user", translate("Socks5 User"), translate("Only when Socks5 Auth Mode is password valid, Mandatory."))
@@ -224,6 +226,7 @@ for key, server_type in pairs(type_table) do
         o:depends("server", key)
     end
 end
+o:depends({server = "same", disable = true}) 
 end
 
 -- Local Port

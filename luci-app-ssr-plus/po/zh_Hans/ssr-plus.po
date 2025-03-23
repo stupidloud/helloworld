@@ -208,13 +208,13 @@ msgid "Certificate fingerprint"
 msgstr "证书指纹"
 
 msgid "shadowTLS protocol Version"
-msgstr "ShadowTLS协议版本"
+msgstr "ShadowTLS 协议版本"
 
 msgid "TLS 1.3 Strict mode"
 msgstr "TLS 1.3 限定模式"
 
 msgid "Disable TCP No_delay"
-msgstr "禁用TCP无延迟"
+msgstr "禁用 TCP 无延迟"
 
 msgid "shadow-TLS SNI"
 msgstr "服务器名称指示"
@@ -222,11 +222,20 @@ msgstr "服务器名称指示"
 msgid "Shadow-TLS ChainPoxy type"
 msgstr "代理链类型"
 
-msgid "Shadowsocks-rust Version"
-msgstr "shadowsocks rust 版本"
+msgid "ShadowSocks Node Use Version"
+msgstr "ShadowSocks 节点使用版本"
+
+msgid "Selection ShadowSocks Node Use Version."
+msgstr "选择 ShadowSocks 节点使用版本。"
+
+msgid "ShadowSocks-libev Version"
+msgstr "ShadowSocks-libev 版本"
+
+msgid "ShadowSocks-rust Version"
+msgstr "ShadowSocks-rust 版本"
 
 msgid "Vmess Protocol"
-msgstr "VMESS协议"
+msgstr "VMESS 协议"
 
 msgid "Shadowsocks password"
 msgstr "shadowsocks密码"
@@ -843,8 +852,17 @@ msgstr "修改订阅 URL 和节点关键字后，请先点击更新"
 msgid "Update All Subscribe Servers"
 msgstr "更新所有订阅服务器节点"
 
+msgid "Enable Plugin"
+msgstr "启用插件"
+
 msgid "Plugin"
 msgstr "插件"
+
+msgid "Custom"
+msgstr "自定义"
+
+msgid "Custom Plugin Path"
+msgstr "自定义插件路径"
 
 msgid "Plugin Opts"
 msgstr "插件参数"
@@ -1193,6 +1211,9 @@ msgstr "应用"
 
 msgid "Enable Netflix Mode"
 msgstr "启用 Netflix 分流模式"
+
+msgid "When disabled shunt mode, will same time stopped shunt service."
+msgstr "当停用分流模式时，将同时停止分流服务。"
 
 msgid "TUIC User UUID"
 msgstr "TUIC 用户 uuid"
