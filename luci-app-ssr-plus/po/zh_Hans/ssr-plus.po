@@ -2515,6 +2515,12 @@ msgstr "对被代理的 UDP/443 流量处理方式"
 #~ msgid "Use Other DNS Tunnel(Need to install)"
 #~ msgstr "使用其他 DNS 转发（需要自己安装）"
 
+msgid "Set if the listening socket should be dual-stack"
+msgstr "设置监听套接字为双栈"
+
+msgid "Dual-stack Listening Socket"
+msgstr "双栈 Socket 监听"
+
 #~ msgid "Export SSR"
 #~ msgstr "导出 SSR 配置信息"
 
@@ -2571,3 +2577,12 @@ msgstr "对被代理的 UDP/443 流量处理方式"
 
 #~ msgid "Reset Error"
 #~ msgstr "重置错误"
+
+msgid "Subscribe nodes allows insecure connection as TLS client (insecure)"
+msgstr "订阅节点强制开启 不验证TLS客户端证书 (insecure)"
+
+msgid "MosDNS GeoIP List Data"
+msgstr "【MosDNS GeoIP】数据库"
+
+msgid "Dynamic Mode"
+msgstr "MosDNS动态模式"
