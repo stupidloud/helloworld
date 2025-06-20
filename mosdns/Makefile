@@ -26,9 +26,6 @@ PKG_LICENSE:=GPL-3.0
 PKG_LICENSE_FILE:=LICENSE
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
-PKG_CONFIG_DEPENDS:= \
-	CONFIG_MOSDNS_COMPRESS_UPX
-
 include $(INCLUDE_DIR)/package.mk
 
 UNZIP_CMD:=unzip -q -d $(PKG_BUILD_DIR) $(DL_DIR)/$(PKG_SOURCE)
@@ -42,17 +39,7 @@ define Package/mosdns
   DEPENDS:=@(x86_64||arm||aarch64) +v2ray-geoip +v2ray-geosite
 endef
 
-define Package/mosdns/config
-config MOSDNS_COMPRESS_UPX
-	bool "Compress executable files with UPX"
-	default y
-endef
-
 define Build/Compile
-
-ifneq ($(CONFIG_MOSDNS_COMPRESS_UPX),)
-	$(STAGING_DIR_HOST)/bin/upx --lzma --best $(PKG_BUILD_DIR)/mosdns
-endif
 endef
 
 define Package/mosdns/install
