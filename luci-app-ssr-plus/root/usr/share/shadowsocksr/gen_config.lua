@@ -309,7 +309,6 @@ end
 					initial_windows_size = tonumber(server.initial_windows_size) or nil
 				} or nil,
 				sockopt = {
-					mark = 250,
 					tcpFastOpen = ((server.transport == "xhttp" and server.tcpfastopen == "1") and true or false) or (server.transport ~= "xhttp") and nil, -- XHTTP Tcp Fast Open
 					tcpMptcp = (server.mptcp == "1") and true or nil, -- MPTCP
 					Penetrate = (server.mptcp == "1") and true or nil, -- Penetrate MPTCP
