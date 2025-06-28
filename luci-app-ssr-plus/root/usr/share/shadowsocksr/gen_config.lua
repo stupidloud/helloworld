@@ -348,7 +348,6 @@ if xray_fragment.fragment ~= "0" or (xray_fragment.noise ~= "0" and xray_noise.e
 		},
 		streamSettings = {
 			sockopt = {
-			mark = 250,
 			tcpFastOpen = ((server.transport == "xhttp" and server.tcpfastopen == "1") and true or false) or (server.transport ~= "xhttp") and nil, -- XHTTP Tcp Fast Open
 			tcpMptcp = (server.mptcp == "1") and true or nil, -- MPTCP
 			Penetrate = (server.mptcp == "1") and true or nil, -- Penetrate MPTCP
