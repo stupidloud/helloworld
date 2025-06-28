@@ -307,14 +307,7 @@ end
 					health_check_timeout = tonumber(server.health_check_timeout) or nil,
 					permit_without_stream = (server.permit_without_stream == "1") and true or nil,
 					initial_windows_size = tonumber(server.initial_windows_size) or nil
-				} or nil,
-				sockopt = {
-					tcpFastOpen = ((server.transport == "xhttp" and server.tcpfastopen == "1") and true or false) or (server.transport ~= "xhttp") and nil, -- XHTTP Tcp Fast Open
-					tcpMptcp = (server.mptcp == "1") and true or nil, -- MPTCP
-					Penetrate = (server.mptcp == "1") and true or nil, -- Penetrate MPTCP
-					tcpcongestion = server.custom_tcpcongestion, -- 连接服务器节点的 TCP 拥塞控制算法
-					dialerProxy = (xray_fragment.fragment == "1" or xray_fragment.noise == "1") and "dialerproxy" or nil
-				}
+				} or nil
 			} or nil,
 			mux = (server.v2ray_protocol ~= "wireguard") and {
 				-- mux
