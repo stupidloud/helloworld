@@ -1407,7 +1407,7 @@ start_rules() {
 start_mosdns(){
 	killall -q -9 mosdns
 	sed "s/255.255.255.255/$mosdns_bypass_ip/" /etc/mosdns/config.yaml.tpl > /etc/mosdns/config.yaml
-	/usr/bin/mosdns start -d /etc/mosdns/ -c config.yaml >/dev/null 2>&1 &
+	/etc/mosdns/mosdns start -d /etc/mosdns/ -c config.yaml >/dev/null 2>&1 &
 	sed -i "/list server/d" /etc/config/dhcp
 	uci add_list dhcp.@dnsmasq[0].server='127.0.0.1#5335'
 	uci set dhcp.@dnsmasq[0].noresolv="1"
