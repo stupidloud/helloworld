@@ -408,6 +408,7 @@ ipset -! add blockipv6 2600:f0f2:7010::/48
 ipset -! add blockipv6 2600:f0f2:7011::/48
 ipset -! add blockipv6 2600:f0f2:7012::/48
 ipset -! add blockipv6 2600:f0f2:7014::/48
+ipset -! add blockipv6 2600:f0f2:7013::/48
 ipset -! add blockipv6 2600:f0f2:7017::/48
 ipset -! add blockipv6 2600:9000:3000::/36
 ipset -! add blockipv6 2600:9000:f600::/39
