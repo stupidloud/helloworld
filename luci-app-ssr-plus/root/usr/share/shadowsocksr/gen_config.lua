@@ -17,6 +17,9 @@ local xray_fragment = ucursor:get_all("shadowsocksr", "@global_xray_fragment[0]"
 local xray_noise = ucursor:get_all("shadowsocksr", "@xray_noise_packets[0]") or {}
 local outbound_settings = nil
 
+local node_id = server_section
+local remarks = server.alias or ""
+
 function vmess_vless()
 	outbound_settings = {
 		vnext = {
@@ -217,6 +220,8 @@ end
 						usage = "verify",
 						certificateFile = server.certpath
 					} or nil,
+					echConfigList = (server.enable_ech == "1") and server.ech_config or nil,
+					echForceQuery = (server.enable_ech == "1") and (server.ech_ForceQuery or "none") or nil
 				} or nil,
 				xtlsSettings = (server.xtls == '1') and server.tls_host and {
 					-- xtls
@@ -236,7 +241,7 @@ end
 				rawSettings = (server.transport == "raw" or server.transport == "tcp") and {
 					-- tcp
 					header = {
-						type = server.tcp_guise or "none",
+						type = server.tcp_guise,
 						request = (server.tcp_guise == "http") and {
 							-- request
 							path = {server.http_path} or {"/"},
@@ -324,19 +329,21 @@ end
 if xray_fragment.fragment ~= "0" or (xray_fragment.noise ~= "0" and xray_noise.enabled ~= "0") then
 	table.insert(Xray.outbounds, {
 		protocol = "freedom",
-		tag = "dialerproxy",
+		tag = (remarks ~= nil and remarks ~= "") and (node_id .. "." .. remarks) or node_id,
 		settings = {
 			domainStrategy = (xray_fragment.noise == "1" and xray_noise.enabled == "1") and xray_noise.domainStrategy,
 			fragment = (xray_fragment.fragment == "1") and {
 				packets = (xray_fragment.fragment_packets ~= "") and xray_fragment.fragment_packets or nil,
 				length = (xray_fragment.fragment_length ~= "") and xray_fragment.fragment_length or nil,
-				interval = (xray_fragment.fragment_interval ~= "") and xray_fragment.fragment_interval or nil
+				interval = (xray_fragment.fragment_interval ~= "") and xray_fragment.fragment_interval or nil,
+				maxSplit = (xray_fragment.fragment_maxsplit ~= "") and xray_fragment.fragment_maxsplit or nil
 			} or nil,
 			noises = (xray_fragment.noise == "1" and xray_noise.enabled == "1") and {
 				{
 					type = xray_noise.type,
 					packet = xray_noise.packet,
-					delay = xray_noise.delay:find("-") and xray_noise.delay or tonumber(xray_noise.delay)
+					delay = xray_noise.delay:find("-") and xray_noise.delay or tonumber(xray_noise.delay),
+					applyTo = xray_noise.applyto
 				}
 			} or nil
 		},
