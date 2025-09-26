@@ -31,7 +31,7 @@ function vmess_vless()
 						id = server.vmess_id,
 						alterId = (server.v2ray_protocol == "vmess" or not server.v2ray_protocol) and tonumber(server.alter_id) or nil,
 						security = (server.v2ray_protocol == "vmess" or not server.v2ray_protocol) and server.security or nil,
-						encryption = (server.v2ray_protocol == "vless") and server.vless_encryption or nil,
+						encryption = (server.v2ray_protocol == "vless") and server.vless_encryption or "none", 
 						flow = (((server.xtls == '1') or (server.tls == '1') or (server.reality == '1')) and (((server.tls_flow ~= "none") and server.tls_flow) or ((server.xhttp_tls_flow ~= "none") and server.xhttp_tls_flow))) or nil
 					}
 				}
@@ -208,13 +208,23 @@ end
 			settings = outbound_settings,
 			-- 底层传输配置
 			streamSettings = (server.v2ray_protocol ~= "wireguard") and {
-				network = server.transport or "tcp",
+				network = server.transport or "raw",
 				security = (server.xtls == '1') and "xtls" or (server.tls == '1') and "tls" or (server.reality == '1') and "reality" or nil,
 				tlsSettings = (server.tls == '1') and {
 					-- tls
-					alpn = (server.transport == "xhttp" and server.xhttp_alpn ~= "") and server.xhttp_alpn or server.tls_alpn,
+					alpn = (server.tls_alpn and server.tls_alpn ~= "") and (function()
+						local alpn = {}
+						string.gsub(server.tls_alpn, '[^,]+', function(w)
+							table.insert(alpn, w)
+						end)
+						if #alpn > 0 then
+							return alpn
+						else
+							return nil
+						end
+					end)() or nil,
 					fingerprint = server.fingerprint,
-					allowInsecure = (server.insecure == "1"),
+					allowInsecure = (server.insecure == "1" or server.insecure == true or server.insecure == "true"),
 					serverName = server.tls_host,
 					certificates = server.certificate and {
 						usage = "verify",
@@ -230,10 +240,9 @@ end
 					minVersion = "1.3"
 				} or nil,
 				realitySettings = (server.reality == '1') and {
-					alpn =  (server.transport == "xhttp" and server.xhttp_alpn ~= "") and server.xhttp_alpn or nil,
 					publicKey = server.reality_publickey,
-					shortId = server.reality_shortid,
-					spiderX = server.reality_spiderx,
+					shortId = server.reality_shortid or "",
+					spiderX = server.reality_spiderx or "",
 					fingerprint = server.fingerprint,
 					mldsa65Verify = (server.enable_mldsa65verify == '1') and server.reality_mldsa65verify or nil,
 					serverName = server.tls_host
@@ -263,8 +272,8 @@ end
 				} or nil,
 				wsSettings = (server.transport == "ws") and (server.ws_path or server.ws_host or server.tls_host) and {
 					-- ws
-					Host = server.ws_host or server.tls_host or nil,
-					path = server.ws_path,
+					host = server.ws_host or server.tls_host or nil,
+					path = server.ws_path or "/",
 					maxEarlyData = tonumber(server.ws_ed) or nil,
 					earlyDataHeaderName = server.ws_ed_header or nil
 				} or nil,
@@ -273,12 +282,7 @@ end
 					host = (server.httpupgrade_host or server.tls_host) or nil,
 					path = server.httpupgrade_path or ""
 				} or nil,
-				splithttpSettings = (server.transport == "splithttp") and {
-					-- splithttp
-					host = (server.splithttp_host or server.tls_host) or nil,
-					path = server.splithttp_path or "/"
-				} or nil,
-				xhttpSettings = (server.transport == "xhttp") and {
+				xhttpSettings = (server.transport == "xhttp" or server.transport == "splithttp") and {
 					-- xhttp
 					mode = server.xhttp_mode or "auto",
 					host = (server.xhttp_host or server.tls_host) or nil,
@@ -317,10 +321,10 @@ end
 			} or nil,
 			mux = (server.v2ray_protocol ~= "wireguard") and {
 				-- mux
-				enabled = (server.mux == "1" or server.xmux == "1") and true or false, -- Mux
-				concurrency = (server.mux == "1" and ((server.concurrency ~= "0") and tonumber(server.concurrency) or 8)) or (server.xmux == "1" and -1) or nil, -- TCP 最大并发连接数
-				xudpConcurrency = ((server.xudpConcurrency ~= "0") and tonumber(server.xudpConcurrency)) or nil, -- UDP 最大并发连接数
-				xudpProxyUDP443 = (server.mux == "1") and server.xudpProxyUDP443 or nil -- 对被代理的 UDP/443 流量处理方式
+				enabled = (server.mux == "1"), -- Mux
+				concurrency = (server.mux == "1" and (tonumber(server.concurrency) or -1)) or nil, -- TCP 最大并发
+				xudpConcurrency = (server.mux == "1" and (tonumber(server.xudpConcurrency) or 16)) or nil, -- UDP 最大并发
+				xudpProxyUDP443 = (server.mux == "1" and (server.xudpProxyUDP443 or "reject")) or nil -- 对被代理的 UDP/443 流量处理方式
 			} or nil
 		}
 	}
@@ -378,12 +382,23 @@ local trojan = {
 		cipher = cipher,
 		cipher_tls13 = cipher13,
 		sni = server.tls_host,
-		alpn = server.tls_alpn or {"h2", "http/1.1"},
+		alpn = (server.tls == "1") and (function()
+			local alpn = {}
+			if server.tls_alpn and server.tls_alpn ~= "" then
+				string.gsub(server.tls_alpn, '[^,]+', function(w)
+					table.insert(alpn, w)
+				end)
+			end
+			if #alpn > 0 then
+				return alpn
+			else
+				return nil
+			end
+		end)() or {"h2", "http/1.1"},
 		curve = "",
 		reuse_session = true,
 		session_ticket = (server.tls_sessionTicket == "1") and true or false
 	},
-	udp_timeout = 60,
 	tcp = {
 		-- tcp
 		no_delay = true,
@@ -458,7 +473,7 @@ local hysteria2 = {
 	} or nil,
 	quic = (server.flag_quicparam == "1" ) and {
 		initStreamReceiveWindow = (server.initstreamreceivewindow and server.initstreamreceivewindow or nil),
-		maxStreamReceiveWindow = (server.maxstreamseceivewindow and server.maxstreamseceivewindow or nil),
+		maxStreamReceiveWindow = (server.maxstreamreceivewindow and server.maxstreamreceivewindow or nil),
 		initConnReceiveWindow = (server.initconnreceivewindow and server.initconnreceivewindow or nil),
 		maxConnReceiveWindow = (server.maxconnreceivewindow and server.maxconnreceivewindow or nil),
 		maxIdleTimeout = (tonumber(server.maxidletimeout) and tonumber(server.maxidletimeout) .. "s" or nil),
@@ -466,14 +481,39 @@ local hysteria2 = {
 		disablePathMTUDiscovery = (server.disablepathmtudiscovery == "1") and true or false
 	} or nil,
 	auth = server.hy2_auth,
-	tls = server.tls_host and {
+	tls = (server.tls_host and server.tls_host ~= "") and {
 		sni = server.tls_host,
-		--alpn = server.tls_alpn or nil,
+		alpn = (server.tls_alpn and server.tls_alpn ~= "") and (function()
+			local alpn = {}
+			string.gsub(server.tls_alpn, '[^,]+', function(w)
+				table.insert(alpn, w)
+			end)
+			if #alpn > 0 then
+				return alpn
+			else
+				return nil
+			end
+		end)() or nil,
+		--sni = server.tls_host or (server.tls_host and server.tls_alpn) or nil,
 		insecure = (server.insecure == "1") and true or false,
-		pinSHA256 = (server.insecure == "1") and server.pinsha256 or nil
+		pinSHA256 = server.pinsha256 or nil
 	} or {
 		sni = server.server,
-		insecure = (server.insecure == "1") and true or false
+		alpn = (server.type == "hysteria2") and (function()
+			local alpn = {}
+			if server.tls_alpn and server.tls_alpn ~= "" then
+				string.gsub(server.tls_alpn, '[^,]+', function(w)
+					table.insert(alpn, w)
+				end)
+			end
+			if #alpn > 0 then
+				return alpn
+			else
+				return nil
+			end
+		end)() or nil,
+		insecure = (server.insecure == "1") and true or false,
+		pinSHA256 = server.pinsha256 or nil
 	},
 	fast_open = (server.fast_open == "1") and true or false,
 	lazy = (server.lazy_mode == "1") and true or false
@@ -570,7 +610,17 @@ local tuic = {
 			timeout = server.timeout and server.timeout .. "s" or nil,
 			gc_interval = server.gc_interval and server.gc_interval .. "s" or nil,
 			gc_lifetime = server.gc_lifetime and server.gc_lifetime .. "s" or nil,
-			alpn = server.tls_alpn,
+			alpn = (server.tuic_alpn and server.tuic_alpn ~= "") and (function()
+				local alpn = {}
+				string.gsub(server.tuic_alpn, '[^,]+', function(w)
+					table.insert(alpn, w)
+				end)
+				if #alpn > 0 then
+					return alpn
+				else
+					return nil
+				end
+			end)() or nil,
 			disable_sni = (server.disable_sni == "1") and true or false,
 			zero_rtt_handshake = (server.zero_rtt_handshake == "1") and true or false,
 			send_window = tonumber(server.send_window),
@@ -655,4 +705,3 @@ function config:handleIndex(index)
 end
 local f = config:new()
 f:handleIndex(server.type)
-
