@@ -70,6 +70,7 @@ LUCI_DEPENDS:= \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client:shadowsocksr-libev-ssr-redir \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Client:shadowsocksr-libev-ssr-redir \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_ShadowsocksR_Libev_Server:shadowsocksr-libev-ssr-check \
+	+PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns:mosdns \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_Trojan:trojan
 
 
@@ -231,12 +232,16 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_Trojan
 	select PACKAGE_$(PKG_NAME)_INCLUDE_IPT2Socks
 	default n
 
+config PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns
+	bool "Include mosdns"
+	default y
 endef
 
 
 define Package/$(PKG_NAME)/conffiles
 /etc/config/shadowsocksr
 /etc/ssrplus/
+/etc/mosdns/config.yaml
 endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
