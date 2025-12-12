@@ -236,6 +236,10 @@ config PACKAGE_$(PKG_NAME)_INCLUDE_Mosdns
 	default y
 endef
 
+define Package/$(PKG_NAME)/install
+$(call Package/luci-app-ssr-plus/install/default)
+	chmod +x $(1)/etc/ssrplus/blockipv6.sh
+endef
 
 define Package/$(PKG_NAME)/conffiles
 /etc/config/shadowsocksr
