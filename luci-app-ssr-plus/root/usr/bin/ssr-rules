@@ -428,20 +428,23 @@ ipset_iptables() {
 		$IPT -A SS_SPEC_WAN_AC -j SS_SPEC_WAN_FW
 		;;
 	esac
+	ipset -N blacklist hash:net 2>/dev/null
+	ipset -N whitelist hash:net 2>/dev/null
+	if [ $? -eq 0 ]; then
+	while read ip; do
+		ipset -! add blacklist $ip
+	done < /etc/ssrplus/blackipv4.sh
+	fi
+	# 按优先级从低到高添加规则（使用-I后添加的规则优先级高）
+	$IPT -I SS_SPEC_WAN_AC -m set --match-set blacklist dst -j SS_SPEC_WAN_FW
 	ipset -N fplan hash:net 2>/dev/null
 	for ip in $LAN_FP_IP; do ipset -! add fplan "$ip"; done
 		$IPT -I SS_SPEC_WAN_AC -m set --match-set fplan src -j SS_SPEC_WAN_FW
 	ipset -N bplan hash:net 2>/dev/null
 	for ip in $LAN_BP_IP; do ipset -! add bplan "$ip"; done
 		$IPT -I SS_SPEC_WAN_AC -m set --match-set bplan src -j RETURN
-	ipset -N whitelist hash:net 2>/dev/null
-	ipset -N blacklist hash:net 2>/dev/null
-	if [ $? -eq 0 ]; then
-	while read ip; do
-		ipset -! add blacklist $ip
-	done < /etc/ssrplus/blackipv4.sh
-	fi
-	$IPT -I SS_SPEC_WAN_AC -m set --match-set blacklist dst -j SS_SPEC_WAN_FW
+	# 白名单优先级最高，放在最后添加
+	for ip in $WAN_BP_IP; do ipset -! add whitelist "$ip"; done
 	$IPT -I SS_SPEC_WAN_AC -m set --match-set whitelist dst -j RETURN
 	if [ $(ipset list music -name -quiet | grep music) ]; then
 		$IPT -I SS_SPEC_WAN_AC -m set --match-set music dst -j RETURN 2>/dev/null
