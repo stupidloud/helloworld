@@ -42,6 +42,7 @@ jobs:
         echo '!gas62014'|nc whois.radb.net 43 | tail +2 | head -n -1 | xargs -n1 echo | blackipv4
         echo '!gas62041'|nc whois.radb.net 43 | tail +2 | head -n -1 | xargs -n1 echo | blackipv4
         echo '!gas211157'|nc whois.radb.net 43 | tail +2 | head -n -1 | xargs -n1 echo | blackipv4
+        echo '!gas209242'|nc whois.radb.net 43 | tail +2 | head -n -1 | xargs -n1 echo | blackipv4
         curl https://ip-ranges.amazonaws.com/ip-ranges.json | jq -r '.prefixes[] | select(.service=="S3" or .service=="CLOUDFRONT") | .ip_prefix' | blackipv4
         curl https://raw.githubusercontent.com/Gelob/azure-cdn-ips/master/edgenodes-ipv4.txt | blackipv4
         curl https://api.github.com/meta | jq -r '.web[]' | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | blackipv4
