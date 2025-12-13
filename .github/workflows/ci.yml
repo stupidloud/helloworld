@@ -3,9 +3,7 @@ name: Update-IPs
 on:
   schedule:
     - cron: '10 */8 * * *'
-  watch:
-    types:
-      - 'started'
+  workflow_dispatch:
 
 jobs:
   merge:
