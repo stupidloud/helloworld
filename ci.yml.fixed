@@ -1,0 +1,124 @@
+# 更新CDN厂商IP地址黑名单
+name: Update-IPs
+
+on:
+  schedule:
+    - cron: '10 */8 * * *'
+  workflow_dispatch:
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4  # 修复1: 升级到v4
+      with:
+        fetch-depth: 0
+        ref: tmp
+        token: ${{ secrets.GITHUB_TOKEN }}  # 修复5: 添加token配置
+
+    - name: Install dependencies  # 修复8: 添加依赖安装
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq netcat-openbsd ipset iptables
+
+    - name: Set git identity
+      run: |
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+
+    - name: Load new hi-freq IPs
+      run: |
+        set -e  # 修复2: 启用错误时退出
+        set -o pipefail  # 修复2: 管道错误传播
+        
+        # 修复3: 使用函数替代别名
+        blockipv6() {
+            xargs -n1 -I{} echo "ipset -! add blockipv6 {}" | tee -a luci-app-ssr-plus/root/etc/ssrplus/blockipv6.sh  # 修复6: 使用-I替代-i
+        }
+        
+        blackipv4() {
+            tee -a luci-app-ssr-plus/root/etc/ssrplus/blackipv4.sh
+        }
+        
+        # 修复10: 添加IP验证函数
+        validate_ipv4() {
+            grep -E '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}(/[0-9]{1,2})?$'
+        }
+        
+        validate_ipv6() {
+            grep -E '^([0-9a-fA-F]{1,4}:){2,7}[0-9a-fA-F]{0,4}(/[0-9]{1,3})?$|^::(/[0-9]{1,3})?$'
+        }
+        
+        # 修复7: 确保blockipv6.sh有正确的初始化
+        head -n4 luci-app-ssr-plus/root/etc/ssrplus/blockipv6.sh > blockipv6.sh.tmp
+        mv blockipv6.sh.tmp luci-app-ssr-plus/root/etc/ssrplus/blockipv6.sh
+        
+        # 修复7: 为blackipv4.sh添加初始化（如果需要）
+        # 这里假设blackipv4.sh不需要特殊的初始化头部，如果需要，应该类似处理
+        echo "# CDN and High-frequency IPs Blacklist" > luci-app-ssr-plus/root/etc/ssrplus/blackipv4.sh
+        
+        # 修复2: 所有curl命令添加错误处理和超时
+        echo "Fetching Cloudflare IPv6..."
+        curl -fsSL --max-time 30 --retry 3 https://www.cloudflare.com/ips-v6 | validate_ipv6 | blockipv6 || echo "Warning: Failed to fetch Cloudflare IPv6"
+        
+        echo "Fetching Fastly IPv6..."
+        curl -fsSL --max-time 30 --retry 3 https://api.fastly.com/public-ip-list | jq -r '.ipv6_addresses[]' | validate_ipv6 | blockipv6 || echo "Warning: Failed to fetch Fastly IPv6"
+        
+        echo "Fetching AWS CloudFront and S3 IPv6..."
+        curl -fsSL --max-time 30 --retry 3 https://ip-ranges.amazonaws.com/ip-ranges.json | jq -r '.ipv6_prefixes[] | select(.service=="S3" or .service=="CLOUDFRONT") | .ipv6_prefix' | validate_ipv6 | blockipv6 || echo "Warning: Failed to fetch AWS IPv6"
+        
+        echo "Fetching Azure CDN IPv6..."
+        curl -fsSL --max-time 30 --retry 3 https://raw.githubusercontent.com/Gelob/azure-cdn-ips/master/edgenodes-ipv6.txt | validate_ipv6 | blockipv6 || echo "Warning: Failed to fetch Azure IPv6"
+        
+        echo "Fetching GitHub IPv6..."
+        curl -fsSL --max-time 30 --retry 3 https://api.github.com/meta | jq -r '.web[]' | validate_ipv6 | blockipv6 || echo "Warning: Failed to fetch GitHub IPv6"
+        
+        echo "Fetching Cloudflare IPv4..."
+        curl -fsSL --max-time 30 --retry 3 https://www.cloudflare.com/ips-v4 | validate_ipv4 | blackipv4 || echo "Warning: Failed to fetch Cloudflare IPv4"
+        
+        echo "Fetching Fastly IPv4..."
+        curl -fsSL --max-time 30 --retry 3 https://api.fastly.com/public-ip-list | jq -r '.addresses[]' | validate_ipv4 | blackipv4 || echo "Warning: Failed to fetch Fastly IPv4"
+        
+        # 修复4&11: Telegram WHOIS查询添加错误处理，使用正确的tail语法
+        echo "Fetching Telegram AS44907 IPv4..."
+        echo '!gas44907' | nc -w 10 whois.radb.net 43 | tail -n +2 | head -n -1 | xargs -n1 echo | validate_ipv4 | blackipv4 || echo "Warning: Failed to fetch Telegram AS44907"
+        
+        echo "Fetching Telegram AS59930 IPv4..."
+        echo '!gas59930' | nc -w 10 whois.radb.net 43 | tail -n +2 | head -n -1 | xargs -n1 echo | validate_ipv4 | blackipv4 || echo "Warning: Failed to fetch Telegram AS59930"
+        
+        echo "Fetching Telegram AS62014 IPv4..."
+        echo '!gas62014' | nc -w 10 whois.radb.net 43 | tail -n +2 | head -n -1 | xargs -n1 echo | validate_ipv4 | blackipv4 || echo "Warning: Failed to fetch Telegram AS62014"
+        
+        echo "Fetching Telegram AS62041 IPv4..."
+        echo '!gas62041' | nc -w 10 whois.radb.net 43 | tail -n +2 | head -n -1 | xargs -n1 echo | validate_ipv4 | blackipv4 || echo "Warning: Failed to fetch Telegram AS62041"
+        
+        echo "Fetching Telegram AS211157 IPv4..."
+        echo '!gas211157' | nc -w 10 whois.radb.net 43 | tail -n +2 | head -n -1 | xargs -n1 echo | validate_ipv4 | blackipv4 || echo "Warning: Failed to fetch Telegram AS211157"
+        
+        echo "Fetching Cloudflare London AS209242 IPv4..."
+        echo '!gas209242' | nc -w 10 whois.radb.net 43 | tail -n +2 | head -n -1 | xargs -n1 echo | validate_ipv4 | blackipv4 || echo "Warning: Failed to fetch Cloudflare London AS209242"
+        
+        echo "Fetching AWS CloudFront and S3 IPv4..."
+        curl -fsSL --max-time 30 --retry 3 https://ip-ranges.amazonaws.com/ip-ranges.json | jq -r '.prefixes[] | select(.service=="S3" or .service=="CLOUDFRONT") | .ip_prefix' | validate_ipv4 | blackipv4 || echo "Warning: Failed to fetch AWS IPv4"
+        
+        echo "Fetching Azure CDN IPv4..."
+        curl -fsSL --max-time 30 --retry 3 https://raw.githubusercontent.com/Gelob/azure-cdn-ips/master/edgenodes-ipv4.txt | validate_ipv4 | blackipv4 || echo "Warning: Failed to fetch Azure IPv4"
+        
+        echo "Fetching GitHub IPv4..."
+        curl -fsSL --max-time 30 --retry 3 https://api.github.com/meta | jq -r '.web[]' | validate_ipv4 | blackipv4 || echo "Warning: Failed to fetch GitHub IPv4"
+        
+        # 修复9: 改进的git commit处理
+        git add luci-app-ssr-plus/root/etc/ssrplus/blackipv4.sh luci-app-ssr-plus/root/etc/ssrplus/blockipv6.sh
+        
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m 'update cloudflare and telegram IPs'
+        fi
+
+    - name: Push Commits
+      run: git push origin tmp
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 修复5: 添加token环境变量
