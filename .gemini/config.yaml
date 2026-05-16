@@ -1,0 +1,14 @@
+# Gemini Code Assist repository configuration.
+# Schema: https://developers.google.com/gemini-code-assist/docs/customize-repo-review#config.yaml-schema
+
+have_fun: false
+
+code_review:
+  disable: false
+  pull_request_opened:
+    help: false
+    summary: true
+    code_review: true
+    include_drafts: true
+  comment_severity_threshold: MEDIUM
+  max_review_comments: -1
