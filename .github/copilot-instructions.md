@@ -1,5 +1,13 @@
 # OpenWrt helloworld 项目 AI 编码助手指导
 
+## Pull Request Review 语言要求
+
+- GitHub Copilot 在进行 Pull Request code review、review summary、inline review comments、request changes 或回复 review comments 时，必须使用简体中文。
+- 技术名词、文件名、函数名、配置项、命令和代码片段可以保留英文。
+- 评论应简洁、直接、面向可执行修改建议。
+
+## 项目背景
+
 本项目是一个针对 OpenWrt 的代理工具包集合，主要包含 ShadowSocks、V2Ray、Xray、Trojan 等各种网络代理工具的 OpenWrt 包。
 
 ## 项目架构概览
@@ -38,7 +46,7 @@ include $(TOPDIR)/feeds/packages/lang/rust/rust-package.mk      # Rust
 ```
 
 ### 包依赖管理
-- **运行时依赖**: `DEPENDS:=+ca-bundle +libstdcpp` 
+- **运行时依赖**: `DEPENDS:=+ca-bundle +libstdcpp`
 - **架构限制**: `depends on !(arc||armeb||mips)` 排除特定架构
 - **条件依赖**: 通过 `CONFIG_PACKAGE_*` 实现选择性依赖
 
