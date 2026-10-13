@@ -10,7 +10,8 @@ ipset -! add blockipv6 2405:8100::/32
 ipset -! add blockipv6 2a06:98c0::/29
 ipset -! add blockipv6 2c0f:f248::/32
 ipset -! add blockipv6 2a04:4e40::/32
-ipset -! add blockipv6 2a04:4e42::/32
+ipset -! add blockipv6 2a04:4e42::/31
+ipset -! add blockipv6 2a04:4e44::/32
 ipset -! add blockipv6 2406:daf9:a800::/40
 ipset -! add blockipv6 2a05:d07a:a000::/40
 ipset -! add blockipv6 2a05:d070:e000::/40
